@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "logscope"
+version = "2.5.1"
+description = "A Python program for analyzing logs by checking them against log pattern specifications."
+authors = [
+    "Alex Groce <agroce@gmail.com>",
+    "Klaus Havelund <klaus.havelund@jpl.nasa.gov>"
+]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [
+    { include = "lsm" },
+    { include = "ply" },
+]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
