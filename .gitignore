@@ -6,3 +6,7 @@
 
 # Python
 *.pyc
+
+dist/
+*.tar.gz
+*.whl
