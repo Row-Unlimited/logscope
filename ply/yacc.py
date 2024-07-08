@@ -53,6 +53,8 @@
 __version__ = "2.5"
 __tabversion__ = "2.4"  # Table version
 
+import functools
+
 #-----------------------------------------------------------------------------
 #                     === User configurable parameters ===
 #
@@ -83,20 +85,6 @@ class YaccError(Exception):   pass
 
 # Exception raised for errors raised in production rules
 class SyntaxError(Exception): pass
-
-
-# Available instance types.  This is used when parsers are defined by a class.
-# it's a little funky because I want to preserve backwards compatibility
-# with Python 2.0 where types.ObjectType is undefined.
-
-try:
-    _INSTANCETYPE = (types.InstanceType, types.ObjectType)
-except AttributeError:
-    _INSTANCETYPE = types.InstanceType
-
-
-    class object:
-        pass  # Note: needed if no new-style classes present
 
 
 #-----------------------------------------------------------------------------
@@ -2700,7 +2688,7 @@ def yacc(method=default_lr, debug=yaccdebug, module=None, tabmodule=tab_module, 
         # User supplied a module object.
         if isinstance(module, types.ModuleType):
             ldict = module.__dict__
-        elif isinstance(module, _INSTANCETYPE):
+        elif isinstance(module, object):
             _items = [(k, getattr(module, k)) for k in dir(module)]
             ldict = {}
             for i in _items:
@@ -2770,7 +2758,7 @@ def yacc(method=default_lr, debug=yaccdebug, module=None, tabmodule=tab_module, 
 
     else:
         # Get the tokens map
-        if module and isinstance(module, _INSTANCETYPE):
+        if module and isinstance(module, object):
             tokens = getattr(module, "tokens", None)
         else:
             tokens = ldict.get("tokens", None)
@@ -2833,7 +2821,7 @@ def yacc(method=default_lr, debug=yaccdebug, module=None, tabmodule=tab_module, 
             raise YaccError("no rules of the form p_rulename are defined.")
 
         # Sort the symbols by line number
-        symbols.sort(lambda x, y: x.__code__.co_firstlineno - y.__code__.co_firstlineno)
+        symbols.sort(key=functools.cmp_to_key(lambda x, y: x.__code__.co_firstlineno - y.__code__.co_firstlineno))
 
         # Add all of the symbols to the grammar
         for f in symbols:
@@ -2845,7 +2833,7 @@ def yacc(method=default_lr, debug=yaccdebug, module=None, tabmodule=tab_module, 
         # Make a signature of the docstrings
         for f in symbols:
             if f.__doc__:
-                Signature.update(f.__doc__)
+                Signature.update(f.__doc__.encode())
 
         lr_init_vars()
 

@@ -26,6 +26,7 @@ __version__ = "2.5"
 __tabversion__ = "2.4"  # Version of table file used
 
 import copy
+import functools
 import os
 import re
 import sys
@@ -33,20 +34,6 @@ import types
 
 # This regular expression is used to match valid token names
 _is_identifier = re.compile(r'^[a-zA-Z0-9_]+$')
-
-# _INSTANCETYPE sets the valid set of instance types recognized
-# by PLY when lexers are defined by a class. In order to maintain
-# backwards compatibility with Python-2.0, we have to check for
-# the existence of ObjectType.
-
-try:
-    _INSTANCETYPE = (types.InstanceType, object)
-except AttributeError:
-    _INSTANCETYPE = types.InstanceType
-
-
-    class object:
-        pass  # Note: needed if no new-style classes present
 
 
 # Exception thrown when invalid token encountered and no default error
@@ -547,7 +534,7 @@ def lex(module=None, object=None, debug=0, optimize=0, lextab="lextab", reflags=
         # User supplied a module object.
         if isinstance(module, types.ModuleType):
             ldict = module.__dict__
-        elif isinstance(module, _INSTANCETYPE):
+        elif isinstance(module, object):
             _items = [(k, getattr(module, k)) for k in dir(module)]
             ldict = {}
             for (i, v) in _items:
@@ -684,11 +671,11 @@ def lex(module=None, object=None, debug=0, optimize=0, lextab="lextab", reflags=
 
     # Sort the functions by line number
     for f in list(funcsym.values()):
-        f.sort(lambda x, y: x[1].__code__.co_firstlineno - y[1].__code__.co_firstlineno)
+        f.sort(key=functools.cmp_to_key(lambda x, y: x[1].__code__.co_firstlineno - y[1].__code__.co_firstlineno))
 
     # Sort the strings by regular expression length
     for s in list(strsym.values()):
-        s.sort(lambda x, y: (len(x[1]) < len(y[1])) - (len(x[1]) > len(y[1])))
+        s.sort(key=functools.cmp_to_key(lambda x, y: (len(x[1]) < len(y[1])) - (len(x[1]) > len(y[1]))))
 
     regexs = {}
 
