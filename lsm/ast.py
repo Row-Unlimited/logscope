@@ -1,5 +1,3 @@
-
-
 # -----------------------------------------------------------------------------
 # ast.py                           
 #                                                         
@@ -12,26 +10,31 @@
 
 INDENT = 0
 
+
 def indent():
     global INDENT
     INDENT = INDENT + 1
+
 
 def dedent():
     global INDENT
     INDENT = INDENT - 1
 
+
 def spaces():
     global INDENT
     spaces = ""
-    for x in range(0,INDENT):
+    for x in range(0, INDENT):
         spaces += "  "
     return spaces
 
+
 def stringOf(elem):
-    if isinstance(elem,str):
+    if isinstance(elem, str):
         return "\"" + str(elem) + "\""
     else:
         return str(elem)
+
 
 def list2string(list):
     comma = False
@@ -43,6 +46,7 @@ def list2string(list):
             comma = True
         text += str(elem)
     return text
+
 
 def list2stringQuoted(list):
     comma = False
@@ -61,12 +65,12 @@ def list2stringQuoted(list):
 #################
 
 class Specification:
-    def __init__(self,monitors,python=None):
+    def __init__(self, monitors, python=None):
         self.monitors = monitors
         self.python = python
 
-    def getSpecUnit(self,unitName):
-        assert isinstance(unitName,str)
+    def getSpecUnit(self, unitName):
+        assert isinstance(unitName, str)
         for monitor in self.monitors:
             if unitName == monitor.name:
                 return monitor
@@ -74,14 +78,15 @@ class Specification:
 
     def __repr__(self):
         text = "\n"
-        if self.python != None:
+        if self.python is not None:
             text += self.python + "\n\n"
         for monitor in self.monitors:
             text += str(monitor) + "\n\n"
         return text
 
+
 class Automaton:
-    def __init__(self,name,states,initial,forbidden,success):
+    def __init__(self, name, states, initial, forbidden, success):
         self.name = name
         self.states = states
         self.initial = initial
@@ -94,18 +99,19 @@ class Automaton:
         indent()
         for state in self.states:
             text += str(state)
-        if self.initial != []:
+        if self.initial:
             text += "  initial " + list2string(self.initial) + "\n"
-        if self.forbidden != []:
+        if self.forbidden:
             text += "  hot " + list2string(self.forbidden) + "\n"
-        if self.success != []:
+        if self.success:
             text += "  success " + list2string(self.success) + "\n"
         dedent()
         text += "}"
         return text
 
+
 class State:
-    def __init__(self,modifiers,mode,name,formals,rules):
+    def __init__(self, modifiers, mode, name, formals, rules):
         self.modifiers = modifiers
         self.mode = mode
         self.name = name
@@ -119,7 +125,7 @@ class State:
         for modifier in self.modifiers:
             if modifier != "initial":
                 modifiertext += modifier + " "
-        if self.formals != []:
+        if self.formals:
             formalstext = "(" + list2string(self.formals) + ")"
         else:
             formalstext = ""
@@ -131,16 +137,18 @@ class State:
         text += spaces() + "}\n\n"
         return text
 
+
 class Rule:
-    def __init__(self,conditions,actions):
+    def __init__(self, conditions, actions):
         self.conditions = conditions
         self.actions = actions
 
     def __repr__(self):
         return spaces() + list2string(self.conditions) + " => " + list2string(self.actions) + "\n"
 
+
 class Event:
-    def __init__(self,type,constraints,predicate=None):
+    def __init__(self, type, constraints, predicate=None):
         self.type = type
         self.constraints = constraints
         self.predicate = predicate
@@ -152,31 +160,35 @@ class Event:
             predicatetext = " where " + str(self.predicate)
         return self.type + "{" + list2string(self.constraints) + "}" + predicatetext
 
+
 class Constraint:
-    def __init__(self,name,range):
+    def __init__(self, name, range):
         self.name = name
         self.range = range
 
     def __repr__(self):
         return self.name + " : " + stringOf(self.range)
 
+
 class Name:
-    def __init__(self,name):
+    def __init__(self, name):
         self.name = name
-        
+
     def __repr__(self):
         return self.name
 
+
 class Interval:
-    def __init__(self,left,right):
+    def __init__(self, left, right):
         self.left = left
         self.right = right
 
     def __repr__(self):
         return "[" + str(self.left) + "," + str(self.right) + "]"
 
+
 class BitValues:
-    def __init__(self,dict):
+    def __init__(self, dict):
         self.dict = dict
 
     def __repr__(self):
@@ -189,102 +201,114 @@ class BitValues:
         text += "}"
         return text
 
+
 class AtomicPredicate:
-    def __init__(self,funname,arguments):
+    def __init__(self, funname, arguments):
         self.funname = funname
         self.arguments = arguments
 
-    def evaluate(self,localbinding,globalbinding,environment):
+    def evaluate(self, localbinding, globalbinding, environment):
         actuals = []
         for argument in self.arguments:
-            if isinstance(argument,int) or isinstance(argument,str):
+            if isinstance(argument, int) or isinstance(argument, str):
                 actuals.append(argument)
-            elif isinstance(argument,Name):
+            elif isinstance(argument, Name):
                 name = argument.name
                 if name in localbinding:
                     value = localbinding[name]
                 elif name in globalbinding:
                     value = globalbinding[name]
                 else:
-                    assert False , "predicate argument not defined: " + str(name) + " in: " + str(self) 
+                    assert False, "predicate argument not defined: " + str(name) + " in: " + str(self)
                 actuals.append(value)
             else:
-                assert False , "argument not an int, string or name: " + str(argument)
-        function = eval(self.funname,environment)
-        return apply(function,actuals)
+                assert False, "argument not an int, string or name: " + str(argument)
+        function = eval(self.funname, environment)
+        return function(*actuals)
 
     def __repr__(self):
         return self.funname + "(" + list2stringQuoted(self.arguments) + ")"
 
+
 class ExpressionPredicate:
-    def __init__(self,expression):
+    def __init__(self, expression):
         self.expression = expression
 
-    def evaluate(self,localbinding,globalbinding,environment):
+    def evaluate(self, localbinding, globalbinding, environment):
         env = {}
         env.update(environment)
         env.update(globalbinding)
         env.update(localbinding)
-        return eval(self.expression,env)
+        return eval(self.expression, env)
 
     def __repr__(self):
         return "|" + self.expression + "|"
 
+
 class AndPredicate:
-    def __init__(self,predicate1,predicate2):
+    def __init__(self, predicate1, predicate2):
         self.predicate1 = predicate1
         self.predicate2 = predicate2
 
-    def evaluate(self,localbinding,globalbinding,environment):
-        return self.predicate1.evaluate(localbinding,globalbinding,environment) and self.predicate2.evaluate(localbinding,globalbinding,environment)
-        
+    def evaluate(self, localbinding, globalbinding, environment):
+        return self.predicate1.evaluate(localbinding, globalbinding, environment) and self.predicate2.evaluate \
+            (localbinding, globalbinding, environment)
+
     def __repr__(self):
         return str(self.predicate1) + " and " + str(self.predicate2)
 
+
 class OrPredicate:
-    def __init__(self,predicate1,predicate2):
+    def __init__(self, predicate1, predicate2):
         self.predicate1 = predicate1
         self.predicate2 = predicate2
 
-    def evaluate(self,localbinding,globalbinding,environment):
-        return self.predicate1.evaluate(localbinding,globalbinding,environment) or self.predicate2.evaluate(localbinding,globalbinding,environment)
+    def evaluate(self, localbinding, globalbinding, environment):
+        return self.predicate1.evaluate(localbinding, globalbinding, environment) or self.predicate2.evaluate \
+            (localbinding, globalbinding, environment)
 
     def __repr__(self):
         return str(self.predicate1) + " or " + str(self.predicate2)
 
+
 class NotPredicate:
-    def __init__(self,predicate):
+    def __init__(self, predicate):
         self.predicate = predicate
 
-    def evaluate(self,localbinding,globalbinding,environment):
-        return not self.predicate.evaluate(localbinding,globalbinding,environment)
+    def evaluate(self, localbinding, globalbinding, environment):
+        return not self.predicate.evaluate(localbinding, globalbinding, environment)
 
     def __repr__(self):
         return "not " + str(self.predicate)
 
+
 class BracketedPredicate:
-    def __init__(self,predicate):
+    def __init__(self, predicate):
         self.predicate = predicate
 
-    def evaluate(self,localbinding,globalbinding,environment):
-        return self.predicate.evaluate(localbinding,globalbinding,environment)
+    def evaluate(self, localbinding, globalbinding, environment):
+        return self.predicate.evaluate(localbinding, globalbinding, environment)
 
     def __repr__(self):
         return "(" + str(self.predicate) + ")"
 
+
 class Action:
-    def __init__(self,name,actuals=[]):
+    def __init__(self, name, actuals=None):
+        if actuals is None:
+            actuals = []
         self.name = name
         self.actuals = actuals
 
     def __repr__(self):
         text = self.name
-        if self.actuals != []:
+        if self.actuals:
             text += "(" + list2stringQuoted(self.actuals) + ")"
         return text
 
+
 class Pattern:
-    def __init__(self,name,event,consequence):
+    def __init__(self, name, event, consequence):
         self.name = name
         self.event = event
         self.consequence = consequence
@@ -298,36 +322,39 @@ class Pattern:
         dedent()
         dedent()
         return text
-    
+
+
 class NegatedEvent:
-    def __init__(self,event):
+    def __init__(self, event):
         self.event = event
 
     def __repr__(self):
         return "!" + str(self.event)
 
-def  consequences2string(consequencelist,begin,end):
+
+def consequences2string(consequencelist, begin, end):
     text = begin + "\n"
     indent()
     length = len(consequencelist)
-    for index in range(0,length-1): # goes from 0 to (length-1)-1
+    for index in range(0, length - 1):  # goes from 0 to (length-1)-1
         text += spaces() + str(consequencelist[index]) + ",\n"
-    text += spaces() + str(consequencelist[length-1]) + "\n"
+    text += spaces() + str(consequencelist[length - 1]) + "\n"
     dedent()
     text += spaces() + end
     return text
 
+
 class ConsequenceSequence:
-    def __init__(self,consequencelist):
+    def __init__(self, consequencelist):
         self.consequencelist = consequencelist
 
     def __repr__(self):
-        return consequences2string(self.consequencelist,"[","]")
+        return consequences2string(self.consequencelist, "[", "]")
+
 
 class ConsequenceSet:
-    def __init__(self,consequencelist):
+    def __init__(self, consequencelist):
         self.consequencelist = consequencelist
 
     def __repr__(self):
-        return consequences2string(self.consequencelist,"{","}")
-
+        return consequences2string(self.consequencelist, "{", "}")

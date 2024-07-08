@@ -11,16 +11,16 @@ _lr_action_items = {'PATTERN':([0,1,3,4,6,8,9,11,13,51,54,64,66,82,93,95,109,125
 _lr_action = { }
 for _k, _v in _lr_action_items.items():
    for _x,_y in zip(_v[0],_v[1]):
-      if not _lr_action.has_key(_x):  _lr_action[_x] = { }
+      if _x not in _lr_action.keys():  _lr_action[_x] = { }
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
 _lr_goto_items = {'consequencelist':([52,53,],[67,69,]),'forbidden':([35,],[45,]),'argument':([57,101,123,],[77,116,77,]),'actions':([34,99,],[41,115,]),'states':([14,],[19,]),'names':([46,55,60,],[61,70,83,]),'statekind':([17,],[32,]),'event':([15,38,50,52,53,56,72,94,114,126,],[27,54,66,54,54,75,75,54,75,75,]),'monitor':([0,9,],[3,13,]),'pattern':([0,6,9,],[4,4,4,]),'specification':([0,],[5,]),'initial':([19,],[35,]),'bitvalues':([89,],[108,]),'monitors':([0,],[9,]),'state':([14,19,],[20,36,]),'arguments':([57,123,],[79,132,]),'automaton':([0,6,9,],[8,8,8,]),'type':([15,38,50,52,53,56,72,94,114,126,],[26,26,26,26,26,26,26,26,26,26,]),'formals':([55,],[71,]),'predicate':([91,111,112,121,122,],[109,124,125,130,131,]),'rules':([56,114,],[72,126,]),'bitvalue':([89,120,],[107,129,]),'action':([34,58,99,],[44,81,44,]),'value':([89,120,],[105,105,]),'modifiers':([14,19,],[17,17,]),'success':([45,],[59,]),'constraint':([37,65,],[48,92,]),'conditions':([56,72,114,126,],[73,73,73,73,]),'rule':([56,72,114,126,],[74,97,74,97,]),'monitorspec':([0,6,9,],[1,11,1,]),'range':([63,118,],[87,128,]),'consequence':([38,52,53,94,],[51,68,68,113,]),'modifier':([14,17,19,],[16,33,16,]),'constraints':([37,],[49,]),}
 
 _lr_goto = { }
-for _k, _v in _lr_goto_items.items():
+for _k, _v in list(_lr_goto_items.items()):
    for _x,_y in zip(_v[0],_v[1]):
-       if not _lr_goto.has_key(_x): _lr_goto[_x] = { }
+       if _x not in _lr_goto: _lr_goto[_x] = { }
        _lr_goto[_x][_k] = _y
 del _lr_goto_items
 _lr_productions = [

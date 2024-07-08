@@ -11,7 +11,7 @@ _lr_action_items = {'PYTHON':([0,],[4,]),'PATTERN':([0,1,3,4,5,7,9,10,12,13,15,5
 _lr_action = { }
 for _k, _v in _lr_action_items.items():
    for _x,_y in zip(_v[0],_v[1]):
-      if not _lr_action.has_key(_x):  _lr_action[_x] = { }
+      if _x not in _lr_action.keys():  _lr_action[_x] = { }
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
@@ -20,7 +20,7 @@ _lr_goto_items = {'consequencelist':([54,55,],[69,71,]),'forbidden':([37,],[47,]
 _lr_goto = { }
 for _k, _v in _lr_goto_items.items():
    for _x,_y in zip(_v[0],_v[1]):
-       if not _lr_goto.has_key(_x): _lr_goto[_x] = { }
+       if _x not in _lr_goto.keys(): _lr_goto[_x] = { }
        _lr_goto[_x][_k] = _y
 del _lr_goto_items
 _lr_productions = [

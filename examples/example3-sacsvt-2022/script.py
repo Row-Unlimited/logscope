@@ -31,15 +31,15 @@ class CSVReader:
         self.converter = converter
         self.line_count = 0
         for x in range(skip):
-            self.next()
+            next(self)
 
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         self.line_count += 1
-        next = self.csv_reader.next()
-        return self.converter(next)
+        next_item = next(self.csv_reader)
+        return self.converter(next_item)
 
     def close(self):
         self.csv_file.close()
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     for event in csv_reader:
         observer.eventNr = observer.eventNr + 1
         if observer.eventNr % 1000 == 0:
-            print '---> ', observer.eventNr
+            print('---> ', observer.eventNr)
         observer.next(event)
     observer.end()
     csv_reader.close()
