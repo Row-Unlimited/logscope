@@ -1,2 +1,8 @@
 .DS_Store
 .idea/
+
+# Backup files
+*~
+
+# Python
+*.pyc
