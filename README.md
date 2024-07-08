@@ -30,9 +30,9 @@ pip install ./logscope-*.whl
 
 To run LogScope on an example, do the following:
 
-```bash
-$ cd examples/example1
-$ python script.py
+```shell
+cd examples/example1
+python script.py
 ```
 
 The results will be stored in the `results` directory local to the example, as well as being printed on std out.
