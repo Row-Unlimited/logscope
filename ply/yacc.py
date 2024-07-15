@@ -54,6 +54,7 @@ __version__ = "2.5"
 __tabversion__ = "2.4"  # Table version
 
 import functools
+import importlib
 
 #-----------------------------------------------------------------------------
 #                     === User configurable parameters ===
@@ -2648,7 +2649,7 @@ def lr_read_tables(module=tab_module, optimize=0):
         if isinstance(module, types.ModuleType):
             parsetab = module
         else:
-            exec("import %s as parsetab" % module)
+            parsetab = importlib.import_module(module)
 
         if (optimize) or (Signature.digest() == parsetab._lr_signature):
             _lr_action = parsetab._lr_action
