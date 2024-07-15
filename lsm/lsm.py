@@ -1030,7 +1030,7 @@ class Specification:
 def calcNewestStem(names):
     count = 0
     for name in names:
-        match = re.match("L(\d+)\\_", name)
+        match = re.match(r"L(\d+)\\_", name)
         if match is not None:
             thiscount = int(match.group(1))
             count = max(count, thiscount)
